@@ -40,3 +40,32 @@ def test_get_root_with_index(tmp_path, monkeypatch):
     assert response.status_code == 200
     assert response.text == "Hello World html"
 
+def test_static_mounts():
+    # Write a temporary file to static directory
+    os.makedirs("static", exist_ok=True)
+    temp_static_file = os.path.join("static", "test_static_mount.txt")
+    with open(temp_static_file, "w") as f:
+        f.write("static content")
+    
+    # Write a temporary file to models directory
+    os.makedirs("models", exist_ok=True)
+    temp_models_file = os.path.join("models", "test_models_mount.txt")
+    with open(temp_models_file, "w") as f:
+        f.write("models content")
+        
+    try:
+        response_static = client.get("/static/test_static_mount.txt")
+        assert response_static.status_code == 200
+        assert response_static.text == "static content"
+        
+        response_models = client.get("/models/test_models_mount.txt")
+        assert response_models.status_code == 200
+        assert response_models.text == "models content"
+    finally:
+        # Clean up
+        if os.path.exists(temp_static_file):
+            os.remove(temp_static_file)
+        if os.path.exists(temp_models_file):
+            os.remove(temp_models_file)
+
+

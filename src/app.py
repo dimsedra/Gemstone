@@ -2,6 +2,7 @@ import os
 import json
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="Gemstone Classification System")
 
@@ -34,3 +35,8 @@ def get_info():
         "classes": classes_sorted,
         "metrics_chart_available": metrics_exists
     }
+
+# Serve rest of static files (css, js, images)
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+# Serve models directory as static so we can load the metrics chart in frontend
+app.mount("/models", StaticFiles(directory=models_dir), name="models")
