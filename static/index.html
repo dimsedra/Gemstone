@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemstone Identifier Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Gemstone Classifier</h1>
+            <p class="subtitle">AI Powered Identification Platform &mdash; <span id="model-status">Loading Model...</span></p>
+        </header>
+
+        <main class="dashboard-grid">
+            <!-- Left Panel: Classification -->
+            <section class="panel glass-panel upload-section">
+                <h2>Identify Gemstone</h2>
+                
+                <div class="drop-zone" id="drop-zone">
+                    <div class="drop-zone-prompt">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path>
+                        </svg>
+                        <p>Drag & Drop your gemstone image here</p>
+                        <span>or click to browse files</span>
+                    </div>
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    <img id="image-preview" src="" alt="Gemstone preview" style="display: none;">
+                </div>
+
+                <div id="result-container" class="result-container" style="display: none;">
+                    <div class="divider"></div>
+                    <h3>Classification Results</h3>
+                    <div class="primary-result">
+                        <span class="label">Top Match</span>
+                        <h4 id="top-prediction">Diamond</h4>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="confidence-bar"></div>
+                        </div>
+                        <span class="confidence-val" id="confidence-text">98.5%</span>
+                    </div>
+
+                    <div class="top-5-list">
+                        <h5>Alternative Matches</h5>
+                        <div id="alt-predictions-list">
+                            <!-- Dynamic Alternative List -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Diagnostics & Info -->
+            <section class="panel glass-panel info-section">
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="switchTab('metrics')">Training Diagnostics</button>
+                    <button class="tab-btn" onclick="switchTab('classes')">Supported Gemstones</button>
+                </div>
+                
+                <div class="tab-content" id="metrics-tab">
+                    <h3>Training Metrics</h3>
+                    <p class="tab-desc">Epoch curves demonstrating the training vs validation loss and accuracy metrics of the model.</p>
+                    <div class="chart-container">
+                        <img id="metrics-chart" src="/models/training_metrics.png" alt="Training Metrics Chart" style="max-width: 100%; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="tab-content" id="classes-tab" style="display: none;">
+                    <div class="search-header">
+                        <h3>Supported Gemstones (<span id="classes-count">0</span>)</h3>
+                        <input type="text" id="class-search" placeholder="Search gemstone name..." onkeyup="filterClasses()">
+                    </div>
+                    <div class="class-list-container">
+                        <ul id="supported-classes-list" class="class-list">
+                            <!-- Dynamic Class List -->
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
