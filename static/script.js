@@ -91,8 +91,11 @@ document.addEventListener("DOMContentLoaded", () => {
             method: "POST",
             body: formData
         })
-        .then(res => {
-            if (!res.ok) throw new Error("Classification request failed.");
+        .then(async res => {
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.detail || "Classification request failed.");
+            }
             return res.json();
         })
         .then(data => {
@@ -138,20 +141,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Tab Switcher
-    window.switchTab = function(tabName) {
+    window.switchTab = function(tabName, event) {
         document.querySelectorAll(".tab-content").forEach(el => el.style.display = "none");
         document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
         
         document.getElementById(`${tabName}-tab`).style.display = "block";
-        
-        // Robust element selection for active tab button styling
-        const btns = document.querySelectorAll(".tab-btn");
-        btns.forEach(btn => {
-            const onclickAttr = btn.getAttribute("onclick") || "";
-            if (onclickAttr.includes(`'${tabName}'`)) {
-                btn.classList.add("active");
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add("active");
+        } else {
+            const activeBtn = document.querySelector(`.tab-btn[onclick*="'${tabName}'"]`);
+            if (activeBtn) {
+                activeBtn.classList.add("active");
             }
-        });
+        }
     };
 
     // Search filter for gemstone list
