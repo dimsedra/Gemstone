@@ -110,6 +110,15 @@ def test_predict_not_an_image():
     assert response.status_code == 400
     assert response.json()["detail"] == "Uploaded file is not an image."
 
+def test_predict_none_mime_type(monkeypatch):
+    import src.app
+    monkeypatch.setattr(src.app, "classifier", MockClassifier())
+    response = client.post("/predict", files={"file": ("test", b"fake_image_bytes", None)})
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Uploaded file is not an image."
+
+
+
 def test_predict_success(monkeypatch):
     import src.app
     monkeypatch.setattr(src.app, "classifier", MockClassifier())
