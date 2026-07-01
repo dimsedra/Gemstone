@@ -1,6 +1,4 @@
 import os
-import json
-import pytest
 from fastapi.testclient import TestClient
 
 from src.app import app
@@ -44,8 +42,12 @@ def test_get_root_with_index(tmp_path, monkeypatch):
     assert response.status_code == 200
     assert response.text == "Hello World html"
 
-def test_static_mounts():
-    from src.app import static_dir, models_dir
+def test_static_mounts(tmp_path, monkeypatch):
+    import src.app
+    # Redirect models_dir to tmp_path
+    monkeypatch.setattr(src.app, "models_dir", str(tmp_path))
+    
+    static_dir = src.app.static_dir
 
     # Write a temporary file to static directory
     os.makedirs(static_dir, exist_ok=True)
@@ -53,21 +55,13 @@ def test_static_mounts():
     with open(temp_static_file, "w") as f:
         f.write("static content")
     
-    # Write a dummy training_metrics.png file in the absolute models directory
-    os.makedirs(models_dir, exist_ok=True)
-    dummy_metrics_file = os.path.join(models_dir, "training_metrics.png")
-    
-    # Backup real training_metrics.png if it exists
-    metrics_backup = None
-    if os.path.exists(dummy_metrics_file):
-        with open(dummy_metrics_file, "rb") as f:
-            metrics_backup = f.read()
-
+    # Write a dummy training_metrics.png file in the temporary models directory
+    dummy_metrics_file = os.path.join(str(tmp_path), "training_metrics.png")
     with open(dummy_metrics_file, "w") as f:
         f.write("dummy png content")
 
-    # Write a temporary other file in the models directory to test 404
-    temp_weights_file = os.path.join(models_dir, "some_weights.pth")
+    # Write a temporary other file in the temporary models directory to test 404
+    temp_weights_file = os.path.join(str(tmp_path), "some_weights.pth")
     with open(temp_weights_file, "w") as f:
         f.write("weights content")
         
@@ -88,16 +82,6 @@ def test_static_mounts():
         # Clean up
         if os.path.exists(temp_static_file):
             os.remove(temp_static_file)
-        if os.path.exists(temp_weights_file):
-            os.remove(temp_weights_file)
-        
-        # Restore or clean up training_metrics.png
-        if metrics_backup is not None:
-            with open(dummy_metrics_file, "wb") as f:
-                f.write(metrics_backup)
-        else:
-            if os.path.exists(dummy_metrics_file):
-                os.remove(dummy_metrics_file)
 
 class MockClassifier:
     def __init__(self, model_path=None, mapping_path=None):

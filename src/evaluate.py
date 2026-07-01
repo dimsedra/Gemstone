@@ -2,21 +2,19 @@ import os
 import json
 import torch
 import torch.nn as nn
-from torchvision import datasets, transforms, models
+from torchvision import datasets, transforms
 from torchvision.models import resnet50
 from torch.utils.data import DataLoader
 from sklearn.metrics import classification_report, accuracy_score
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 
 def evaluate_model():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Evaluating on device: {device}")
 
     # Paths
-    test_dir = "data/test"
-    models_dir = "models"
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    test_dir = os.path.join(BASE_DIR, "data", "test")
+    models_dir = os.path.join(BASE_DIR, "models")
     
     # Load class indices from training
     with open(os.path.join(models_dir, "class_indices.json"), "r") as f:

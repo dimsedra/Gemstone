@@ -2,7 +2,7 @@ import os
 import json
 import torch
 import torch.nn as nn
-from PIL import Image
+from PIL import Image, ImageOps
 from torchvision import transforms
 from torchvision.models import resnet50
 
@@ -39,9 +39,13 @@ class GemstoneClassifier:
     def predict(self, image_path_or_file):
         # Load image
         if isinstance(image_path_or_file, str):
-            img = Image.open(image_path_or_file).convert("RGB")
+            img = Image.open(image_path_or_file)
+            img = ImageOps.exif_transpose(img)
+            img = img.convert("RGB")
         else:
-            img = Image.open(image_path_or_file).convert("RGB")
+            img = Image.open(image_path_or_file)
+            img = ImageOps.exif_transpose(img)
+            img = img.convert("RGB")
 
         # Apply transform and add batch dimension
         img_tensor = self.transform(img).unsqueeze(0).to(self.device)

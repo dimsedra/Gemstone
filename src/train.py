@@ -7,6 +7,8 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 from torchvision.models import resnet50, ResNet50_Weights
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 def train_model():
@@ -15,10 +17,11 @@ def train_model():
     print(f"Using device: {device}")
 
     # Paths
-    data_dir = "data"
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_dir = os.path.join(BASE_DIR, "data")
+    models_dir = os.path.join(BASE_DIR, "models")
     train_dir = os.path.join(data_dir, "train")
     valid_dir = os.path.join(data_dir, "valid")
-    models_dir = "models"
     os.makedirs(models_dir, exist_ok=True)
 
     # Transforms - center crop is already applied by Roboflow, so we just flip/rotate
