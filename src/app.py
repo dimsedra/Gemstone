@@ -12,6 +12,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 static_dir = os.path.join(BASE_DIR, "static")
 models_dir = os.path.join(BASE_DIR, "models")
 
+# Ensure directories exist prior to Starlette StaticFiles instantiation
+os.makedirs(static_dir, exist_ok=True)
+os.makedirs(models_dir, exist_ok=True)
+
 # Initialize classifier lazily on startup
 classifier = None
 classifier_lock = threading.Lock()
