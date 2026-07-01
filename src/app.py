@@ -10,6 +10,7 @@ app = FastAPI(title="Gemstone Classification System")
 static_dir = "static"
 models_dir = "models"
 os.makedirs(static_dir, exist_ok=True)
+os.makedirs(models_dir, exist_ok=True)
 
 # Initialize classifier lazily on startup
 classifier = None

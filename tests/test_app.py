@@ -13,9 +13,14 @@ def test_get_info():
     assert response.status_code == 200
     data = response.json()
     assert "trained" in data
-    assert "total_classes" in data
-    assert "classes" in data
-    assert "metrics_chart_available" in data
+    if data["trained"]:
+        assert "total_classes" in data
+        assert "classes" in data
+        assert "metrics_chart_available" in data
+    else:
+        assert data["trained"] is False
+        assert "classes" in data
+        assert len(data["classes"]) == 0
 
 def test_get_root_missing_index(tmp_path, monkeypatch):
     # Temporarily change static_dir in app to a non-existent or empty folder
