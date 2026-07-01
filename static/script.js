@@ -26,12 +26,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 supportedClassesList.innerHTML = data.classes.map(cls => `<li>${cls}</li>`).join('');
                 
                 // Reload training metrics image if available to bypass browser caching
+                const metricsChart = document.getElementById("metrics-chart");
+                const metricsPlaceholder = document.getElementById("metrics-placeholder");
                 if (data.metrics_chart_available) {
-                    document.getElementById("metrics-chart").src = `/models/training_metrics.png?t=${new Date().getTime()}`;
+                    metricsChart.src = `/models/training_metrics.png?t=${new Date().getTime()}`;
+                    metricsChart.style.display = "block";
+                    metricsPlaceholder.style.display = "none";
+                } else {
+                    metricsChart.style.display = "none";
+                    metricsPlaceholder.style.display = "block";
                 }
             } else {
                 modelStatus.textContent = "Offline (Model not trained)";
                 modelStatus.style.color = "#ef4444";
+                document.getElementById("metrics-chart").style.display = "none";
+                document.getElementById("metrics-placeholder").style.display = "block";
             }
         })
         .catch(err => {
@@ -71,6 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Please upload a valid image file.");
             return;
         }
+
+        resultContainer.style.display = "none";
 
         // Show Preview
         const reader = new FileReader();

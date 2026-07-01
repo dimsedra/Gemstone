@@ -45,16 +45,24 @@ def test_get_root_with_index(tmp_path, monkeypatch):
     assert response.text == "Hello World html"
 
 def test_static_mounts():
+    from src.app import static_dir, models_dir
+
     # Write a temporary file to static directory
-    os.makedirs("static", exist_ok=True)
-    temp_static_file = os.path.join("static", "test_static_mount.txt")
+    os.makedirs(static_dir, exist_ok=True)
+    temp_static_file = os.path.join(static_dir, "test_static_mount.txt")
     with open(temp_static_file, "w") as f:
         f.write("static content")
     
     # Write a dummy training_metrics.png file in the absolute models directory
-    from src.app import models_dir
     os.makedirs(models_dir, exist_ok=True)
     dummy_metrics_file = os.path.join(models_dir, "training_metrics.png")
+    
+    # Backup real training_metrics.png if it exists
+    metrics_backup = None
+    if os.path.exists(dummy_metrics_file):
+        with open(dummy_metrics_file, "rb") as f:
+            metrics_backup = f.read()
+
     with open(dummy_metrics_file, "w") as f:
         f.write("dummy png content")
 
@@ -80,10 +88,16 @@ def test_static_mounts():
         # Clean up
         if os.path.exists(temp_static_file):
             os.remove(temp_static_file)
-        if os.path.exists(dummy_metrics_file):
-            os.remove(dummy_metrics_file)
         if os.path.exists(temp_weights_file):
             os.remove(temp_weights_file)
+        
+        # Restore or clean up training_metrics.png
+        if metrics_backup is not None:
+            with open(dummy_metrics_file, "wb") as f:
+                f.write(metrics_backup)
+        else:
+            if os.path.exists(dummy_metrics_file):
+                os.remove(dummy_metrics_file)
 
 class MockClassifier:
     def __init__(self, model_path=None, mapping_path=None):
