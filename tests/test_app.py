@@ -68,4 +68,54 @@ def test_static_mounts():
         if os.path.exists(temp_models_file):
             os.remove(temp_models_file)
 
+class MockClassifier:
+    def __init__(self, model_path=None, mapping_path=None):
+        pass
+    def predict(self, file_like):
+        return {
+            "prediction": "Ruby",
+            "confidence": 0.95,
+            "top_5": [
+                {"class": "Ruby", "confidence": 0.95},
+                {"class": "Sapphire", "confidence": 0.03},
+                {"class": "Emerald", "confidence": 0.01},
+                {"class": "Diamond", "confidence": 0.005},
+                {"class": "Quartz", "confidence": 0.005}
+            ]
+        }
+
+def test_predict_model_not_available(monkeypatch):
+    import src.app
+    monkeypatch.setattr(src.app, "classifier", None)
+    
+    # Mock os.path.exists to return False for the model path
+    import os
+    original_exists = os.path.exists
+    def mock_exists(path):
+        if "gemstone_resnet50.pth" in path:
+            return False
+        return original_exists(path)
+    monkeypatch.setattr(os.path, "exists", mock_exists)
+    
+    response = client.post("/predict", files={"file": ("test.jpg", b"dummy image data", "image/jpeg")})
+    assert response.status_code == 503
+    assert response.json()["detail"] == "Model is not trained/available."
+
+def test_predict_not_an_image():
+    response = client.post("/predict", files={"file": ("test.txt", b"dummy text data", "text/plain")})
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Uploaded file is not an image."
+
+def test_predict_success(monkeypatch):
+    import src.app
+    monkeypatch.setattr(src.app, "classifier", MockClassifier())
+    
+    response = client.post("/predict", files={"file": ("test.jpg", b"fake_image_bytes", "image/jpeg")})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["prediction"] == "Ruby"
+    assert data["confidence"] == 0.95
+    assert len(data["top_5"]) == 5
+
 

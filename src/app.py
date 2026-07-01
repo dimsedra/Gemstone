@@ -1,8 +1,9 @@
 import os
 import json
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from src.inference import GemstoneClassifier
 
 app = FastAPI(title="Gemstone Classification System")
 
@@ -10,12 +11,50 @@ static_dir = "static"
 models_dir = "models"
 os.makedirs(static_dir, exist_ok=True)
 
+# Initialize classifier lazily on startup
+classifier = None
+
+@app.on_event("startup")
+def load_classifier():
+    global classifier
+    model_path = os.path.join(models_dir, "gemstone_resnet50.pth")
+    mapping_path = os.path.join(models_dir, "class_indices.json")
+    
+    if not os.path.exists(model_path) or not os.path.exists(mapping_path):
+        print(f"Warning: Model or class indices not found. Make sure to train the model first.")
+    else:
+        classifier = GemstoneClassifier(model_path, mapping_path)
+        print("Classifier loaded successfully.")
+
 @app.get("/")
 def get_index():
     index_path = os.path.join(static_dir, "index.html")
     if not os.path.exists(index_path):
         return {"message": "Frontend index.html not found. Place it in /static folder."}
     return FileResponse(index_path)
+
+# Model Prediction endpoint
+@app.post("/predict")
+async def predict_gemstone(file: UploadFile = File(...)):
+    global classifier
+    if classifier is None:
+        # Try to initialize if it wasn't initialized
+        model_path = os.path.join(models_dir, "gemstone_resnet50.pth")
+        mapping_path = os.path.join(models_dir, "class_indices.json")
+        if os.path.exists(model_path) and os.path.exists(mapping_path):
+            classifier = GemstoneClassifier(model_path, mapping_path)
+        else:
+            raise HTTPException(status_code=503, detail="Model is not trained/available.")
+
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Uploaded file is not an image.")
+
+    try:
+        # Run prediction directly from uploaded file stream
+        result = classifier.predict(file.file)
+        return {"success": True, **result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
 
 @app.get("/info")
 def get_info():
