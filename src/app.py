@@ -36,7 +36,7 @@ def get_index():
 
 # Model Prediction endpoint
 @app.post("/predict")
-async def predict_gemstone(file: UploadFile = File(...)):
+def predict_gemstone(file: UploadFile = File(...)):
     global classifier
     if classifier is None:
         # Try to initialize if it wasn't initialized

@@ -3,7 +3,6 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-# We will import the app. Since src.app doesn't exist, this will fail.
 from src.app import app
 
 client = TestClient(app)
