@@ -8,10 +8,9 @@ from src.inference import GemstoneClassifier
 
 app = FastAPI(title="Gemstone Classification System")
 
-static_dir = "static"
-models_dir = "models"
-os.makedirs(static_dir, exist_ok=True)
-os.makedirs(models_dir, exist_ok=True)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+static_dir = os.path.join(BASE_DIR, "static")
+models_dir = os.path.join(BASE_DIR, "models")
 
 # Initialize classifier lazily on startup
 classifier = None
@@ -20,6 +19,8 @@ classifier_lock = threading.Lock()
 @app.on_event("startup")
 def load_classifier():
     global classifier
+    os.makedirs(static_dir, exist_ok=True)
+    os.makedirs(models_dir, exist_ok=True)
     model_path = os.path.join(models_dir, "gemstone_resnet50.pth")
     mapping_path = os.path.join(models_dir, "class_indices.json")
     
@@ -47,6 +48,8 @@ def predict_gemstone(file: UploadFile = File(...)):
                 model_path = os.path.join(models_dir, "gemstone_resnet50.pth")
                 mapping_path = os.path.join(models_dir, "class_indices.json")
                 if os.path.exists(model_path) and os.path.exists(mapping_path):
+                    os.makedirs(static_dir, exist_ok=True)
+                    os.makedirs(models_dir, exist_ok=True)
                     classifier = GemstoneClassifier(model_path, mapping_path)
                 else:
                     raise HTTPException(status_code=503, detail="Model is not trained/available.")
