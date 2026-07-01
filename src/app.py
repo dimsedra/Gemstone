@@ -89,5 +89,11 @@ def get_info():
 
 # Serve rest of static files (css, js, images)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
-# Serve models directory as static so we can load the metrics chart in frontend
-app.mount("/models", StaticFiles(directory=models_dir), name="models")
+
+@app.get("/models/training_metrics.png")
+def get_metrics_chart():
+    chart_path = os.path.join(models_dir, "training_metrics.png")
+    if os.path.exists(chart_path):
+        return FileResponse(chart_path)
+    raise HTTPException(status_code=404, detail="Metrics chart not found")
+

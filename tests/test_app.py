@@ -51,26 +51,39 @@ def test_static_mounts():
     with open(temp_static_file, "w") as f:
         f.write("static content")
     
-    # Write a temporary file to models directory
-    os.makedirs("models", exist_ok=True)
-    temp_models_file = os.path.join("models", "test_models_mount.txt")
-    with open(temp_models_file, "w") as f:
-        f.write("models content")
+    # Write a dummy training_metrics.png file in the absolute models directory
+    from src.app import models_dir
+    os.makedirs(models_dir, exist_ok=True)
+    dummy_metrics_file = os.path.join(models_dir, "training_metrics.png")
+    with open(dummy_metrics_file, "w") as f:
+        f.write("dummy png content")
+
+    # Write a temporary other file in the models directory to test 404
+    temp_weights_file = os.path.join(models_dir, "some_weights.pth")
+    with open(temp_weights_file, "w") as f:
+        f.write("weights content")
         
     try:
         response_static = client.get("/static/test_static_mount.txt")
         assert response_static.status_code == 200
         assert response_static.text == "static content"
         
-        response_models = client.get("/models/test_models_mount.txt")
-        assert response_models.status_code == 200
-        assert response_models.text == "models content"
+        # Test metrics chart endpoint
+        response_metrics = client.get("/models/training_metrics.png")
+        assert response_metrics.status_code == 200
+        assert response_metrics.text == "dummy png content"
+
+        # Test arbitrary file in models directory returns 404
+        response_weights = client.get("/models/some_weights.pth")
+        assert response_weights.status_code == 404
     finally:
         # Clean up
         if os.path.exists(temp_static_file):
             os.remove(temp_static_file)
-        if os.path.exists(temp_models_file):
-            os.remove(temp_models_file)
+        if os.path.exists(dummy_metrics_file):
+            os.remove(dummy_metrics_file)
+        if os.path.exists(temp_weights_file):
+            os.remove(temp_weights_file)
 
 class MockClassifier:
     def __init__(self, model_path=None, mapping_path=None):
