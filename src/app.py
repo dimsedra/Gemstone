@@ -1,10 +1,20 @@
 import os
 import json
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 
 app = FastAPI(title="Gemstone Classification System")
 
+static_dir = "static"
 models_dir = "models"
+os.makedirs(static_dir, exist_ok=True)
+
+@app.get("/")
+def get_index():
+    index_path = os.path.join(static_dir, "index.html")
+    if not os.path.exists(index_path):
+        return {"message": "Frontend index.html not found. Place it in /static folder."}
+    return FileResponse(index_path)
 
 @app.get("/info")
 def get_info():
