@@ -2,6 +2,8 @@
 
 An AI-powered local gemstone identification dashboard using PyTorch (ResNet50) for transfer learning and a FastAPI backend with a sleek glassmorphic dark-mode frontend.
 
+For the full academic research findings, per-class metrics, and analysis, please refer to the [Research Documentation](docs/research/research_documentation.md).
+
 ---
 
 ## 1. Project Directory Structure
@@ -10,6 +12,9 @@ An AI-powered local gemstone identification dashboard using PyTorch (ResNet50) f
 gemstone/
 ├── .venv/                     # Python Virtual Environment (git-ignored)
 ├── data/                      # Dataset folders (train, valid, test)
+├── docs/                      # Project documentation
+│   └── research/
+│       └── research_documentation.md # Detailed research report & paper analysis
 ├── models/                    # Trained weights and outputs (git-ignored)
 │   ├── gemstone_resnet50.pth  # Best model checkpoint
 │   ├── class_indices.json     # 87 class index to gemstone name mapping
