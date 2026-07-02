@@ -1,6 +1,12 @@
 .venv/
-data/
-models/
+# Ignore all contents of data and models, but keep the folders and .gitkeep files
+data/**
+!data/**/
+!data/**/.gitkeep
+
+models/**
+!models/**/
+!models/**/.gitkeep
 __pycache__/
 *.pyc
 *.pth
