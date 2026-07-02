@@ -91,11 +91,25 @@ If you modify the dataset or want to retrain/test the model, you can run the fol
 ```
 
 ### Step B: Train the Model
-To start training the ResNet50 model using transfer learning on your local GPU (GeForce RTX 3060) or CPU:
+To start training the ResNet50 model using transfer learning:
 ```powershell
 python src/train.py
 ```
 *This will run for up to 100 epochs with early stopping (patience = 5). It will automatically save the best model weights to `models/gemstone_resnet50.pth` and curves to `models/training_metrics.png`.*
+
+#### Hardware Requirements & VRAM Benchmarks (RTX 3060 12GB)
+Training is optimized for NVIDIA CUDA-enabled GPUs, but will fall back to CPU if unavailable. Below is the VRAM usage profile based on the **GeForce RTX 3060 (12GB VRAM)**:
+
+| Mode | Batch Size | VRAM Usage | Notes |
+|---|---|---|---|
+| **Frozen Backbone** (Current) | 64 | **~2.8 GB** | Very lightweight. Fits easily on 4GB+ GPUs. |
+| **Fully Unfrozen** (Fine-tuning) | 64 | **~3.5 GB** | Recommended only if fine-tuning backbone layers. |
+| **Frozen Backbone** (Maxed) | 256 | **~8.2 GB** | Fast training. Best for 8GB+ VRAM GPUs. |
+
+**Recommendations:**
+- **Local GPU Training**: A local GPU with **at least 4 GB VRAM** (e.g., GTX 1660, RTX 3050) is highly recommended.
+- **Cloud Training**: If your local machine lacks a dedicated GPU or has less than 4 GB VRAM, it is advised to run the training script in a cloud environment (e.g., Google Colab, Kaggle Notebooks, or Lambda Labs) utilizing a free T4 GPU.
+- **Batch Size Scaling**: If you experience out-of-memory (OOM) errors on smaller GPUs, open `src/train.py` and lower `batch_size` in the DataLoader from `64` to `32` or `16`.
 
 ### Step C: Evaluate on the Test Set
 To calculate model classification metrics and overall accuracy on the test set:
