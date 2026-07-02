@@ -41,7 +41,15 @@ gemstone/
 To run this application locally, follow these setup steps:
 
 ### Step A: Clone the Repository & Create Virtual Environment
-1. **Open your terminal or PowerShell** in the project's root directory:
+1. **Clone the repository** and navigate into the project directory:
+   ```powershell
+   # Clone the repository
+   git clone https://github.com/dimsedra/Gemstone.git
+
+   # Navigate into the project folder
+   cd Gemstone
+   ```
+2. **Create and activate a virtual environment**:
    ```powershell
    # Create a virtual environment
    python -m venv .venv
@@ -52,7 +60,7 @@ To run this application locally, follow these setup steps:
    # On CMD:
    .venv\Scripts\activate.bat
    ```
-2. **Install all required dependencies**:
+3. **Install all required dependencies**:
    ```powershell
    pip install -r requirements.txt
    ```
