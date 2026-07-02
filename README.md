@@ -104,7 +104,7 @@ Training is optimized for NVIDIA CUDA-enabled GPUs, but will fall back to CPU if
 |---|---|---|---|
 | **Frozen Backbone** (Current) | 64 | **~2.8 GB** | Very lightweight. Fits easily on 4GB+ GPUs. |
 | **Fully Unfrozen** (Fine-tuning) | 64 | **~3.5 GB** | Recommended only if fine-tuning backbone layers. |
-| **Frozen Backbone** (Maxed) | 256 | **~8.2 GB** | Fast training. Best for 8GB+ VRAM GPUs. |
+| **Frozen Backbone** (Large Batch) | 256 | **~8.2 GB** | Faster training. Best for 8GB+ VRAM GPUs. |
 
 **Recommendations:**
 - **Local GPU Training**: A local GPU with **at least 4 GB VRAM** (e.g., GTX 1660, RTX 3050) is highly recommended.
