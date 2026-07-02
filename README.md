@@ -31,33 +31,57 @@ gemstone/
 
 ---
 
-## 2. How to Run the Web Application
+## 2. Installation and Setup
 
-The environment is already set up and the model is fully trained. To start the local website:
+To run this application locally, follow these setup steps:
 
-1. **Open your terminal or PowerShell** in the project's root folder:
-   `d:\Project Hub\data science\gemstone`
-
-2. **Start the Uvicorn web server**:
+### Step A: Clone the Repository & Create Virtual Environment
+1. **Open your terminal or PowerShell** in the project's root directory:
    ```powershell
-   .venv\Scripts\uvicorn src.app:app --reload
+   # Create a virtual environment
+   python -m venv .venv
+
+   # Activate the virtual environment
+   # On PowerShell:
+   .venv\Scripts\Activate.ps1
+   # On CMD:
+   .venv\Scripts\activate.bat
+   ```
+2. **Install all required dependencies**:
+   ```powershell
+   pip install -r requirements.txt
    ```
 
-3. **Open your web browser** and navigate to:
+### Step B: Download Dataset & Model Weights
+1. Open the [Google Drive Folder](https://drive.google.com/drive/folders/1R_nfCIM8dykIqpB1ORn9C_ljeLn__4u9?usp=sharing).
+2. **Download the model weights** (`gemstone_resnet50.pth` and `training_history.json`) and place them inside the `models/` folder.
+3. **Download the dataset folders** (`train`, `valid`, `test`) and place them inside the `data/` folder so the path structure matches `data/train/`, `data/valid/`, and `data/test/`.
+
+---
+
+## 3. How to Run the Web Application
+
+Once the setup steps are complete:
+
+1. **Start the Uvicorn web server** (ensure your virtual environment is active):
+   ```powershell
+   uvicorn src.app:app --reload
+   ```
+
+2. **Open your web browser** and navigate to:
    ```text
    http://127.0.0.1:8000/
    ```
 
-4. **Upload or drag-and-drop** gemstone images to classify them instantly!
+3. **Upload or drag-and-drop** gemstone images to classify them instantly!
 
 ---
 
-## 3. How to Train or Evaluate the Model (Optional)
+## 4. How to Train or Evaluate the Model (Optional)
 
-If you modify the dataset or want to retrain/test the model, you can run the following scripts.
+If you modify the dataset or want to retrain/test the model, you can run the following scripts:
 
 ### Step A: Activate the Virtual Environment
-Activate the environment in your terminal:
 ```powershell
 # PowerShell
 .venv\Scripts\Activate.ps1
@@ -67,11 +91,11 @@ Activate the environment in your terminal:
 ```
 
 ### Step B: Train the Model
-To start training the ResNet50 model using transfer learning on your local GPU (GeForce RTX 3060):
+To start training the ResNet50 model using transfer learning on your local GPU (GeForce RTX 3060) or CPU:
 ```powershell
 python src/train.py
 ```
-*This will run for 10 epochs and automatically save the best model weights to `models/gemstone_resnet50.pth` and curves to `models/training_metrics.png`.*
+*This will run for up to 100 epochs with early stopping (patience = 5). It will automatically save the best model weights to `models/gemstone_resnet50.pth` and curves to `models/training_metrics.png`.*
 
 ### Step C: Evaluate on the Test Set
 To calculate model classification metrics and overall accuracy on the test set:
